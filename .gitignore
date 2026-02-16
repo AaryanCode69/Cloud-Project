@@ -1,0 +1,4 @@
+/product-service/src/main/resources/application.yaml
+/order-service/src/main/resources/application.yaml
+/inventory-service/src/main/resources/application.yaml
+/user-service/src/main/resources/application.yaml
