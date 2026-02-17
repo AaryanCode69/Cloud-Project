@@ -2,3 +2,4 @@
 /order-service/src/main/resources/application.yaml
 /inventory-service/src/main/resources/application.yaml
 /user-service/src/main/resources/application.yaml
+rules.md
