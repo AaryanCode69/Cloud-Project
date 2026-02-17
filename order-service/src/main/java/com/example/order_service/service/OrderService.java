@@ -1,5 +1,8 @@
 package com.example.order_service.service;
 
+import com.example.order_service.client.InventoryClient;
+import com.example.order_service.client.ProductClient;
+import com.example.order_service.client.dto.ProductClientResponseDTO;
 import com.example.order_service.dto.OrderItemResponseDTO;
 import com.example.order_service.dto.OrderRequestDTO;
 import com.example.order_service.dto.OrderResponseDTO;
@@ -20,19 +23,30 @@ public class OrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private final OrderRepository orderRepository;
+    private final ProductClient productClient;
+    private final InventoryClient inventoryClient;
 
     public OrderResponseDTO createOrder(OrderRequestDTO request) {
         List<OrderItem> items = request.items().stream()
-                .map(item -> OrderItem.builder()
-                        .productId(item.productId())
-                        .quantity(item.quantity())
-                        .price(item.price())
-                        .build())
+                .map(item -> {
+                    ProductClientResponseDTO product = productClient.getProductById(item.productId());
+                    inventoryClient.reduceInventory(item.productId(), item.quantity());
+
+                    return OrderItem.builder()
+                            .productId(item.productId())
+                            .quantity(item.quantity())
+                            .price(product.price())
+                            .build();
+                })
                 .toList();
+
+        double totalAmount = items.stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
 
         Order order = Order.builder()
                 .userId(request.userId())
-                .totalAmount(request.totalAmount())
+                .totalAmount(totalAmount)
                 .items(items)
                 .build();
 
@@ -71,4 +85,3 @@ public class OrderService {
         );
     }
 }
-

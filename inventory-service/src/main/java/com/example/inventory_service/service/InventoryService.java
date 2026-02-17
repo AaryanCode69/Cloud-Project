@@ -2,6 +2,8 @@ package com.example.inventory_service.service;
 
 import com.example.inventory_service.dto.InventoryRequestDTO;
 import com.example.inventory_service.dto.InventoryResponseDTO;
+import com.example.inventory_service.dto.ReduceInventoryRequestDTO;
+import com.example.inventory_service.dto.ReduceInventoryResponseDTO;
 import com.example.inventory_service.entity.Inventory;
 import com.example.inventory_service.exception.ResourceNotFoundException;
 import com.example.inventory_service.repository.InventoryRepository;
@@ -35,6 +37,21 @@ public class InventoryService {
         return toResponse(inventory);
     }
 
+    public ReduceInventoryResponseDTO reduceInventory(ReduceInventoryRequestDTO request) {
+        Inventory inventory = inventoryRepository.findByProductId(request.productId())
+                .orElseThrow(() -> new ResourceNotFoundException("Inventory not found for product"));
+
+        if (inventory.getQuantityAvailable() < request.quantity()) {
+            throw new IllegalStateException("Insufficient inventory");
+        }
+
+        inventory.setQuantityAvailable(inventory.getQuantityAvailable() - request.quantity());
+        Inventory saved = inventoryRepository.save(inventory);
+        log.info("Reduced inventory for productId={} to quantity={}", saved.getProductId(), saved.getQuantityAvailable());
+
+        return new ReduceInventoryResponseDTO("Inventory updated successfully");
+    }
+
     private InventoryResponseDTO toResponse(Inventory inventory) {
         return new InventoryResponseDTO(
                 inventory.getId(),
@@ -44,4 +61,3 @@ public class InventoryService {
         );
     }
 }
-
