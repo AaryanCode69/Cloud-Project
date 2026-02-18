@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -55,12 +56,14 @@ public class OrderService {
         return toResponse(saved);
     }
 
+    @Transactional(readOnly = true)
     public OrderResponseDTO getOrderById(UUID id) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
         return toResponse(order);
     }
 
+    @Transactional(readOnly = true)
     public List<OrderResponseDTO> getOrdersByUserId(UUID userId) {
         return orderRepository.findByUserId(userId).stream()
                 .map(this::toResponse)
