@@ -37,6 +37,16 @@ spec:
               value: "update"
             - name: SERVER_PORT
               value: "8081"
+            - name: FEATURE_AZURE_SQL_ENABLED
+              value: "false"
+            - name: FEATURE_COSMOS_CATALOG_ENABLED
+              value: "false"
+            - name: FEATURE_COSMOS_CART_ENABLED
+              value: "false"
+            - name: FEATURE_SERVICEBUS_ENABLED
+              value: "false"
+            - name: FEATURE_AISEARCH_ENABLED
+              value: "false"
           readinessProbe:
             httpGet:
               path: /actuator/health
