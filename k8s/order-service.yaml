@@ -19,18 +19,38 @@ spec:
           ports:
             - containerPort: 8084
           env:
-            - name: SPRING_DATASOURCE_URL
-              value: "jdbc:postgresql://postgres:5432/orderdb"
-            - name: SPRING_DATASOURCE_USERNAME
+            - name: SPRING_PROFILES_ACTIVE
+              value: "azure-sql"
+            - name: POSTGRES_DATASOURCE_URL
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_USER
-            - name: SPRING_DATASOURCE_PASSWORD
+                  name: postgres-app-secret
+                  key: ORDER_SERVICE_DATASOURCE_URL
+            - name: POSTGRES_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: postgres-secret
-                  key: POSTGRES_PASSWORD
+                  name: postgres-app-secret
+                  key: POSTGRES_DATASOURCE_USERNAME
+            - name: POSTGRES_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-app-secret
+                  key: POSTGRES_DATASOURCE_PASSWORD
+            - name: AZURE_SQL_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: azure-sql-secret
+                  key: ORDER_SERVICE_DATASOURCE_URL
+            - name: AZURE_SQL_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-sql-secret
+                  key: AZURE_SQL_USERNAME
+            - name: AZURE_SQL_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: azure-sql-secret
+                  key: AZURE_SQL_PASSWORD
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: "update"
             - name: SERVER_PORT
@@ -40,7 +60,7 @@ spec:
             - name: EXTERNAL_INVENTORY_SERVICE_URL
               value: "http://inventory-service:8083"
             - name: FEATURE_AZURE_SQL_ENABLED
-              value: "false"
+              value: "true"
             - name: FEATURE_COSMOS_CATALOG_ENABLED
               value: "false"
             - name: FEATURE_COSMOS_CART_ENABLED
