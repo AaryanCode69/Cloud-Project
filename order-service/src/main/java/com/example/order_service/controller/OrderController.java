@@ -1,5 +1,7 @@
 package com.example.order_service.controller;
 
+import com.example.order_service.dto.CartItemRequestDTO;
+import com.example.order_service.dto.CartResponseDTO;
 import com.example.order_service.dto.OrderRequestDTO;
 import com.example.order_service.dto.OrderResponseDTO;
 import com.example.order_service.service.OrderService;
@@ -9,6 +11,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +39,25 @@ public class OrderController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderResponseDTO>> getOrdersByUserId(@PathVariable UUID userId) {
         return ResponseEntity.ok(orderService.getOrdersByUserId(userId));
+    }
+
+    @PostMapping("/cart/{userId}/items")
+    public ResponseEntity<CartResponseDTO> addCartItem(
+            @PathVariable UUID userId,
+            @Valid @RequestBody CartItemRequestDTO request
+    ) {
+        return ResponseEntity.ok(orderService.addCartItem(userId, request));
+    }
+
+    @GetMapping("/cart/{userId}")
+    public ResponseEntity<CartResponseDTO> getCart(@PathVariable UUID userId) {
+        return ResponseEntity.ok(orderService.getCart(userId));
+    }
+
+    @DeleteMapping("/cart/{userId}")
+    public ResponseEntity<Void> clearCart(@PathVariable UUID userId) {
+        orderService.clearCart(userId);
+        return ResponseEntity.noContent().build();
     }
 }
 
