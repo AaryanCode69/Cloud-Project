@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: product-service
-          image: apnacloudproject.azurecr.io/product-service:v1
+          image: apnacloudproject.azurecr.io/product-service:v2
           ports:
             - containerPort: 8082
           env:
@@ -35,30 +35,10 @@ spec:
               value: "update"
             - name: SERVER_PORT
               value: "8082"
-            - name: AZURE_COSMOS_ENDPOINT
-              valueFrom:
-                secretKeyRef:
-                  name: azure-cosmos-secret
-                  key: AZURE_COSMOS_ENDPOINT
-            - name: AZURE_COSMOS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: azure-cosmos-secret
-                  key: AZURE_COSMOS_KEY
-            - name: AZURE_COSMOS_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: azure-cosmos-secret
-                  key: AZURE_COSMOS_DATABASE
-            - name: AZURE_COSMOS_CATALOG_CONTAINER
-              valueFrom:
-                secretKeyRef:
-                  name: azure-cosmos-secret
-                  key: AZURE_COSMOS_CATALOG_CONTAINER
             - name: FEATURE_AZURE_SQL_ENABLED
               value: "false"
             - name: FEATURE_COSMOS_CATALOG_ENABLED
-              value: "true"
+              value: "false"
             - name: FEATURE_COSMOS_CART_ENABLED
               value: "false"
             - name: FEATURE_SERVICEBUS_ENABLED

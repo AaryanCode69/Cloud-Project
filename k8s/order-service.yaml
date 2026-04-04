@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: apnacloudproject.azurecr.io/order-service:v1
+          image: apnacloudproject.azurecr.io/order-service:v2
           ports:
             - containerPort: 8084
           env:
@@ -59,32 +59,12 @@ spec:
               value: "http://product-service:8082"
             - name: EXTERNAL_INVENTORY_SERVICE_URL
               value: "http://inventory-service:8083"
-            - name: AZURE_COSMOS_ENDPOINT
-              valueFrom:
-                secretKeyRef:
-                  name: azure-cosmos-secret
-                  key: AZURE_COSMOS_ENDPOINT
-            - name: AZURE_COSMOS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: azure-cosmos-secret
-                  key: AZURE_COSMOS_KEY
-            - name: AZURE_COSMOS_DATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: azure-cosmos-secret
-                  key: AZURE_COSMOS_DATABASE
-            - name: AZURE_COSMOS_CART_CONTAINER
-              valueFrom:
-                secretKeyRef:
-                  name: azure-cosmos-secret
-                  key: AZURE_COSMOS_CART_CONTAINER
             - name: FEATURE_AZURE_SQL_ENABLED
               value: "true"
             - name: FEATURE_COSMOS_CATALOG_ENABLED
               value: "false"
             - name: FEATURE_COSMOS_CART_ENABLED
-              value: "true"
+              value: "false"
             - name: FEATURE_SERVICEBUS_ENABLED
               value: "false"
             - name: FEATURE_AISEARCH_ENABLED
