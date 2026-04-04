@@ -59,12 +59,22 @@ spec:
               value: "http://product-service:8082"
             - name: EXTERNAL_INVENTORY_SERVICE_URL
               value: "http://inventory-service:8083"
+            - name: AZURE_SERVICEBUS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: azure-servicebus-secret
+                  key: AZURE_SERVICEBUS_CONNECTION_STRING
+            - name: AZURE_SERVICEBUS_QUEUE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-servicebus-secret
+                  key: AZURE_SERVICEBUS_QUEUE_NAME
             - name: FEATURE_COSMOS_CATALOG_ENABLED
               value: "false"
             - name: FEATURE_COSMOS_CART_ENABLED
               value: "false"
             - name: FEATURE_SERVICEBUS_ENABLED
-              value: "false"
+              value: "true"
             - name: FEATURE_AISEARCH_ENABLED
               value: "false"
           readinessProbe:

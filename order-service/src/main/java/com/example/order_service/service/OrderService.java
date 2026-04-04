@@ -13,6 +13,7 @@ import com.example.order_service.dto.OrderRequestDTO;
 import com.example.order_service.dto.OrderResponseDTO;
 import com.example.order_service.entity.Order;
 import com.example.order_service.entity.OrderItem;
+import com.example.order_service.event.OrderEventPublisher;
 import com.example.order_service.exception.ExternalServiceException;
 import com.example.order_service.exception.ResourceNotFoundException;
 import com.example.order_service.repository.OrderRepository;
@@ -32,6 +33,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
     private final InventoryClient inventoryClient;
+    private final OrderEventPublisher orderEventPublisher;
     private final ObjectProvider<CosmosCartService> cosmosCartServiceProvider;
     private final boolean cosmosCartEnabled;
 
@@ -39,12 +41,14 @@ public class OrderService {
             OrderRepository orderRepository,
             ProductClient productClient,
             InventoryClient inventoryClient,
+            OrderEventPublisher orderEventPublisher,
             ObjectProvider<CosmosCartService> cosmosCartServiceProvider,
             @Value("${feature.cosmos-cart-enabled:false}") boolean cosmosCartEnabled
     ) {
         this.orderRepository = orderRepository;
         this.productClient = productClient;
         this.inventoryClient = inventoryClient;
+        this.orderEventPublisher = orderEventPublisher;
         this.cosmosCartServiceProvider = cosmosCartServiceProvider;
         this.cosmosCartEnabled = cosmosCartEnabled;
     }
@@ -74,6 +78,7 @@ public class OrderService {
                 .build();
 
         Order saved = orderRepository.save(order);
+        orderEventPublisher.publishOrderCreated(saved);
 
         if (cosmosCartEnabled) {
             getCosmosCartService().clear(request.userId());
