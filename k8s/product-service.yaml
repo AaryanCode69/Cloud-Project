@@ -37,6 +37,21 @@ spec:
               value: "update"
             - name: SERVER_PORT
               value: "8082"
+            - name: AZURE_SEARCH_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_ENDPOINT
+            - name: AZURE_SEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_API_KEY
+            - name: AZURE_SEARCH_INDEX_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_INDEX_NAME
             - name: FEATURE_COSMOS_CATALOG_ENABLED
               value: "false"
             - name: FEATURE_COSMOS_CART_ENABLED
@@ -44,7 +59,7 @@ spec:
             - name: FEATURE_SERVICEBUS_ENABLED
               value: "false"
             - name: FEATURE_AISEARCH_ENABLED
-              value: "false"
+              value: "true"
           readinessProbe:
             httpGet:
               path: /actuator/health

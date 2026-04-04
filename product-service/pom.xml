@@ -60,6 +60,11 @@
 			<version>4.68.0</version>
 		</dependency>
 		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-search-documents</artifactId>
+			<version>11.7.8</version>
+		</dependency>
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
