@@ -19,14 +19,16 @@ spec:
           ports:
             - containerPort: 8082
           env:
-            - name: SPRING_DATASOURCE_URL
+            - name: SPRING_PROFILES_ACTIVE
+              value: "postgres"
+            - name: POSTGRES_DATASOURCE_URL
               value: "jdbc:postgresql://postgres:5432/productdb"
-            - name: SPRING_DATASOURCE_USERNAME
+            - name: POSTGRES_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_USER
-            - name: SPRING_DATASOURCE_PASSWORD
+            - name: POSTGRES_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
@@ -35,8 +37,6 @@ spec:
               value: "update"
             - name: SERVER_PORT
               value: "8082"
-            - name: FEATURE_AZURE_SQL_ENABLED
-              value: "false"
             - name: FEATURE_COSMOS_CATALOG_ENABLED
               value: "false"
             - name: FEATURE_COSMOS_CART_ENABLED

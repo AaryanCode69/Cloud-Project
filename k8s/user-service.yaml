@@ -57,8 +57,6 @@ spec:
               value: "update"
             - name: SERVER_PORT
               value: "8081"
-            - name: FEATURE_AZURE_SQL_ENABLED
-              value: "true"
             - name: FEATURE_COSMOS_CATALOG_ENABLED
               value: "false"
             - name: FEATURE_COSMOS_CART_ENABLED
