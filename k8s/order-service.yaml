@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: apnacloudproject.azurecr.io/order-service:v2
+          image: apnacloudproject.azurecr.io/order-service:v4
           ports:
             - containerPort: 8084
           env:
@@ -41,12 +41,27 @@ spec:
                 secretKeyRef:
                   name: azure-sql-secret
                   key: ORDER_SERVICE_DATASOURCE_URL
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: azure-sql-secret
+                  key: ORDER_SERVICE_DATASOURCE_URL
             - name: AZURE_SQL_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: azure-sql-secret
                   key: AZURE_SQL_USERNAME
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-sql-secret
+                  key: AZURE_SQL_USERNAME
             - name: AZURE_SQL_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: azure-sql-secret
+                  key: AZURE_SQL_PASSWORD
+            - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: azure-sql-secret
@@ -59,7 +74,27 @@ spec:
               value: "http://product-service:8082"
             - name: EXTERNAL_INVENTORY_SERVICE_URL
               value: "http://inventory-service:8083"
+            - name: COSMOS_URI
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-secret
+                  key: COSMOS_URI
+            - name: COSMOS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-secret
+                  key: COSMOS_KEY
+            - name: COSMOS_DB_ORDER
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-secret
+                  key: COSMOS_DB_ORDER
             - name: AZURE_SERVICEBUS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: azure-servicebus-secret
+                  key: AZURE_SERVICEBUS_CONNECTION_STRING
+            - name: SERVICEBUS_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
                   name: azure-servicebus-secret
@@ -69,12 +104,19 @@ spec:
                 secretKeyRef:
                   name: azure-servicebus-secret
                   key: AZURE_SERVICEBUS_QUEUE_NAME
+            - name: SERVICEBUS_QUEUE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-servicebus-secret
+                  key: AZURE_SERVICEBUS_QUEUE_NAME
             - name: FEATURE_COSMOS_CATALOG_ENABLED
               value: "false"
-            - name: FEATURE_COSMOS_CART_ENABLED
-              value: "false"
-            - name: FEATURE_SERVICEBUS_ENABLED
+            - name: FEATURE_COSMOS_CART
               value: "true"
+            - name: FEATURE_COSMOS_CART_ENABLED
+              value: "true"
+            - name: FEATURE_SERVICEBUS_ENABLED
+              value: "false"
             - name: FEATURE_AISEARCH_ENABLED
               value: "false"
           readinessProbe:

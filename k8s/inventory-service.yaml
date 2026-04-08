@@ -60,7 +60,17 @@ spec:
                 secretKeyRef:
                   name: azure-servicebus-secret
                   key: AZURE_SERVICEBUS_CONNECTION_STRING
+            - name: SERVICEBUS_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: azure-servicebus-secret
+                  key: AZURE_SERVICEBUS_CONNECTION_STRING
             - name: AZURE_SERVICEBUS_QUEUE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-servicebus-secret
+                  key: AZURE_SERVICEBUS_QUEUE_NAME
+            - name: SERVICEBUS_QUEUE_NAME
               valueFrom:
                 secretKeyRef:
                   name: azure-servicebus-secret
@@ -70,7 +80,7 @@ spec:
             - name: FEATURE_COSMOS_CART_ENABLED
               value: "false"
             - name: FEATURE_SERVICEBUS_ENABLED
-              value: "true"
+              value: "false"
             - name: FEATURE_AISEARCH_ENABLED
               value: "false"
           readinessProbe:

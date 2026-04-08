@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: product-service
-          image: apnacloudproject.azurecr.io/product-service:v2
+          image: apnacloudproject.azurecr.io/product-service:v4
           ports:
             - containerPort: 8082
           env:
@@ -23,7 +23,14 @@ spec:
               value: "postgres"
             - name: POSTGRES_DATASOURCE_URL
               value: "jdbc:postgresql://postgres:5432/productdb"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:postgresql://postgres:5432/productdb"
             - name: POSTGRES_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
+            - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
@@ -33,11 +40,36 @@ spec:
                 secretKeyRef:
                   name: postgres-secret
                   key: POSTGRES_PASSWORD
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: "update"
             - name: SERVER_PORT
               value: "8082"
+            - name: COSMOS_URI
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-secret
+                  key: COSMOS_URI
+            - name: COSMOS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-secret
+                  key: COSMOS_KEY
+            - name: COSMOS_DB_PRODUCT
+              valueFrom:
+                secretKeyRef:
+                  name: cosmos-secret
+                  key: COSMOS_DB_PRODUCT
             - name: AZURE_SEARCH_ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_ENDPOINT
+            - name: SEARCH_ENDPOINT
               valueFrom:
                 secretKeyRef:
                   name: azure-search-secret
@@ -47,19 +79,31 @@ spec:
                 secretKeyRef:
                   name: azure-search-secret
                   key: AZURE_SEARCH_API_KEY
+            - name: SEARCH_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_API_KEY
             - name: AZURE_SEARCH_INDEX_NAME
               valueFrom:
                 secretKeyRef:
                   name: azure-search-secret
                   key: AZURE_SEARCH_INDEX_NAME
+            - name: SEARCH_INDEX_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_INDEX_NAME
+            - name: FEATURE_COSMOS
+              value: "true"
             - name: FEATURE_COSMOS_CATALOG_ENABLED
-              value: "false"
+              value: "true"
             - name: FEATURE_COSMOS_CART_ENABLED
               value: "false"
             - name: FEATURE_SERVICEBUS_ENABLED
               value: "false"
             - name: FEATURE_AISEARCH_ENABLED
-              value: "true"
+              value: "false"
           readinessProbe:
             httpGet:
               path: /actuator/health
