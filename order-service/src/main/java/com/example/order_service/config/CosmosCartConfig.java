@@ -16,26 +16,46 @@ public class CosmosCartConfig {
 
     @Bean(destroyMethod = "close")
     public CosmosClient cosmosClient(
-            @Value("${cosmos.endpoint}") String endpoint,
-            @Value("${cosmos.key}") String key
+            @Value("${cosmos.endpoint:${COSMOS_URI:}}") String endpoint,
+            @Value("${cosmos.key:${COSMOS_KEY:}}") String key
     ) {
         return new CosmosClientBuilder()
                 .endpoint(endpoint)
                 .key(key)
+            .gatewayMode()
                 .buildClient();
     }
 
     @Bean
     public CosmosContainer cartContainer(
             CosmosClient cosmosClient,
-            @Value("${cosmos.database}") String databaseName,
-            @Value("${cosmos.cart-container}") String containerName
+            @Value("${cosmos.database:${COSMOS_DB_ORDER:}}") String databaseName,
+            @Value("${cosmos.cart-container:${COSMOS_CART_CONTAINER:cart}}") String containerName
     ) {
-        cosmosClient.createDatabaseIfNotExists(databaseName);
-        CosmosDatabase database = cosmosClient.getDatabase(databaseName);
         CosmosContainerProperties properties = new CosmosContainerProperties(containerName, "/userId");
-        database.createContainerIfNotExists(properties);
-        return database.getContainer(containerName);
+        RuntimeException lastError = null;
+
+        for (int attempt = 1; attempt <= 3; attempt++) {
+            try {
+                cosmosClient.createDatabaseIfNotExists(databaseName);
+                CosmosDatabase database = cosmosClient.getDatabase(databaseName);
+                database.createContainerIfNotExists(properties);
+                return database.getContainer(containerName);
+            } catch (RuntimeException ex) {
+                lastError = ex;
+                if (attempt == 3) {
+                    throw ex;
+                }
+                try {
+                    Thread.sleep(1000L * attempt);
+                } catch (InterruptedException interruptedException) {
+                    Thread.currentThread().interrupt();
+                    throw ex;
+                }
+            }
+        }
+
+        throw lastError;
     }
 }
 
