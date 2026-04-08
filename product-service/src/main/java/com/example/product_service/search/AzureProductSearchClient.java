@@ -48,7 +48,7 @@ public class AzureProductSearchClient implements ProductSearchClient {
             document.put("name", product.name());
             document.put("description", product.description());
             document.put("category", product.category());
-            document.put("price", product.price());
+            document.put("price", product.price() == null ? null : product.price().toString());
             document.put("createdAt", product.createdAt() == null ? null : product.createdAt().toString());
 
             IndexDocumentsBatch<SearchDocument> batch = new IndexDocumentsBatch<>();
@@ -151,9 +151,17 @@ public class AzureProductSearchClient implements ProductSearchClient {
         String description = (String) document.get("description");
         String category = (String) document.get("category");
 
-        Double price = document.get("price") == null
-                ? null
-                : ((Number) document.get("price")).doubleValue();
+        Double price = null;
+        Object priceRaw = document.get("price");
+        if (priceRaw instanceof Number numberValue) {
+            price = numberValue.doubleValue();
+        } else if (priceRaw instanceof String stringValue && !stringValue.isBlank()) {
+            try {
+                price = Double.parseDouble(stringValue);
+            } catch (NumberFormatException ignored) {
+                price = null;
+            }
+        }
 
         Instant createdAt = null;
         Object createdAtRaw = document.get("createdAt");

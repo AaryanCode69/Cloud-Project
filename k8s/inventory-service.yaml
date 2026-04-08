@@ -41,12 +41,27 @@ spec:
                 secretKeyRef:
                   name: azure-sql-secret
                   key: INVENTORY_SERVICE_DATASOURCE_URL
+            - name: SPRING_DATASOURCE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: azure-sql-secret
+                  key: INVENTORY_SERVICE_DATASOURCE_URL
             - name: AZURE_SQL_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: azure-sql-secret
                   key: AZURE_SQL_USERNAME
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-sql-secret
+                  key: AZURE_SQL_USERNAME
             - name: AZURE_SQL_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: azure-sql-secret
+                  key: AZURE_SQL_PASSWORD
+            - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: azure-sql-secret
@@ -90,7 +105,7 @@ spec:
             - name: FEATURE_COSMOS_CART_ENABLED
               value: "false"
             - name: FEATURE_SERVICEBUS_ENABLED
-              value: "false"
+              value: "true"
             - name: FEATURE_AISEARCH_ENABLED
               value: "false"
           readinessProbe:

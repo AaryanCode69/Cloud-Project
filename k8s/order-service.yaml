@@ -126,7 +126,7 @@ spec:
             - name: FEATURE_COSMOS_CART_ENABLED
               value: "true"
             - name: FEATURE_SERVICEBUS_ENABLED
-              value: "false"
+              value: "true"
             - name: FEATURE_AISEARCH_ENABLED
               value: "false"
           readinessProbe:
