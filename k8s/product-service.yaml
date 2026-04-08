@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: product-service
-          image: apnacloudproject.azurecr.io/product-service:v4
+          image: apnacloudproject.azurecr.io/product-service:v5
           ports:
             - containerPort: 8082
           env:

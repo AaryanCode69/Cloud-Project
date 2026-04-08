@@ -23,6 +23,7 @@ public class CosmosCartConfig {
                 .endpoint(endpoint)
                 .key(key)
             .gatewayMode()
+            .contentResponseOnWriteEnabled(true)
                 .buildClient();
     }
 
