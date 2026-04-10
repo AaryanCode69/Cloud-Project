@@ -70,6 +70,21 @@ spec:
               value: "update"
             - name: SERVER_PORT
               value: "8084"
+            - name: AZURE_ENTRA_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: azure-entra-secret
+                  key: AZURE_ENTRA_TENANT_ID
+            - name: AZURE_ENTRA_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: azure-entra-secret
+                  key: AZURE_ENTRA_CLIENT_ID
+            - name: AZURE_ENTRA_API_AUDIENCE
+              valueFrom:
+                secretKeyRef:
+                  name: azure-entra-secret
+                  key: AZURE_ENTRA_API_AUDIENCE
             - name: EXTERNAL_PRODUCT_SERVICE_URL
               value: "http://product-service:8082"
             - name: EXTERNAL_INVENTORY_SERVICE_URL
