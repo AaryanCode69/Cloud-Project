@@ -99,6 +99,11 @@ spec:
                 secretKeyRef:
                   name: azure-search-secret
                   key: AZURE_SEARCH_INDEX_NAME
+            - name: AZURE_SEARCH_SEMANTIC_CONFIGURATION_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_SEMANTIC_CONFIGURATION_NAME
             - name: SEARCH_INDEX_NAME
               valueFrom:
                 secretKeyRef:
@@ -113,7 +118,7 @@ spec:
             - name: FEATURE_SERVICEBUS_ENABLED
               value: "false"
             - name: FEATURE_AISEARCH_ENABLED
-              value: "false"
+              value: "true"
           readinessProbe:
             httpGet:
               path: /actuator/health
