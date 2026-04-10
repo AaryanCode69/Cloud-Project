@@ -1,6 +1,7 @@
 package com.example.order_service.client;
 
 import com.example.order_service.client.dto.ProductClientResponseDTO;
+import com.example.order_service.exception.DownstreamAuthorizationException;
 import com.example.order_service.exception.ExternalServiceException;
 import com.example.order_service.exception.ResourceNotFoundException;
 import java.util.UUID;
@@ -28,10 +29,17 @@ public class ProductClient {
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new ResourceNotFoundException("Product not found");
             }
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                throw new DownstreamAuthorizationException(HttpStatus.UNAUTHORIZED,
+                        "Authentication with product service failed");
+            }
+            if (ex.getStatusCode() == HttpStatus.FORBIDDEN) {
+                throw new DownstreamAuthorizationException(HttpStatus.FORBIDDEN,
+                        "The current token is not allowed to access product service");
+            }
             throw new ExternalServiceException("Product service unavailable");
         } catch (RestClientException ex) {
             throw new ExternalServiceException("Product service unavailable");
         }
     }
 }
-
