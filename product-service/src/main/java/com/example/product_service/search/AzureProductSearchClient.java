@@ -4,11 +4,21 @@ import com.azure.core.util.Context;
 import com.azure.search.documents.SearchClient;
 import com.azure.search.documents.SearchDocument;
 import com.azure.search.documents.indexes.models.IndexDocumentsBatch;
+import com.azure.search.documents.models.QueryAnswer;
+import com.azure.search.documents.models.QueryAnswerType;
+import com.azure.search.documents.models.QueryCaption;
+import com.azure.search.documents.models.QueryCaptionType;
+import com.azure.search.documents.models.QueryType;
 import com.azure.search.documents.models.SearchOptions;
-import com.azure.search.documents.models.SearchResult;
+import com.azure.search.documents.models.SearchMode;
+import com.azure.search.documents.models.SemanticErrorMode;
+import com.azure.search.documents.models.SemanticSearchOptions;
 import com.azure.search.documents.util.SearchPagedIterable;
+import com.example.product_service.config.SearchProperties;
 import com.example.product_service.dto.ProductResponseDTO;
+import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -20,11 +30,14 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(prefix = "feature", name = "aisearch-enabled", havingValue = "true")
 public class AzureProductSearchClient implements ProductSearchClient {
     private static final Logger log = LoggerFactory.getLogger(AzureProductSearchClient.class);
+    private static final String[] SEARCH_FIELDS = {"name", "description", "category"};
 
     private final SearchClient searchClient;
+    private final SearchProperties searchProperties;
 
-    public AzureProductSearchClient(SearchClient searchClient) {
+    public AzureProductSearchClient(SearchClient searchClient, SearchProperties searchProperties) {
         this.searchClient = searchClient;
+        this.searchProperties = searchProperties;
     }
 
     @Override
@@ -50,13 +63,86 @@ public class AzureProductSearchClient implements ProductSearchClient {
 
     @Override
     public List<ProductResponseDTO> search(String query) {
-        SearchOptions options = new SearchOptions().setTop(20);
-        SearchPagedIterable results = searchClient.search(query, options, Context.NONE);
+        String normalizedQuery = query == null ? "" : query.trim();
+        if (normalizedQuery.isBlank()) {
+            return List.of();
+        }
 
-        return results.stream()
-                .map(result -> result.getDocument(SearchDocument.class))
-                .map(this::toResponse)
+        LinkedHashMap<UUID, ProductResponseDTO> combinedResults = new LinkedHashMap<>();
+
+        if (searchProperties.isSemanticEnabled()) {
+            executeSearch(normalizedQuery, buildSemanticOptions(normalizedQuery), combinedResults);
+        }
+
+        executeSearch(normalizedQuery, buildKeywordOptions(), combinedResults);
+
+        if (searchProperties.isFuzzyEnabled()) {
+            String fuzzyQuery = toFuzzyQuery(normalizedQuery);
+            if (!fuzzyQuery.isBlank()) {
+                executeSearch(fuzzyQuery, buildFuzzyOptions(), combinedResults);
+            }
+        }
+
+        return combinedResults.values().stream()
+                .limit(searchProperties.getTop())
                 .toList();
+    }
+
+    private void executeSearch(String query, SearchOptions options, LinkedHashMap<UUID, ProductResponseDTO> combinedResults) {
+        try {
+            SearchPagedIterable results = searchClient.search(query, options, Context.NONE);
+            results.stream()
+                    .map(result -> result.getDocument(SearchDocument.class))
+                    .map(this::toResponse)
+                    .forEach(product -> combinedResults.putIfAbsent(product.id(), product));
+        } catch (Exception ex) {
+            log.warn("Azure AI Search query failed for '{}': {}", query, ex.getMessage());
+        }
+    }
+
+    private SearchOptions buildKeywordOptions() {
+        return baseOptions()
+                .setQueryType(QueryType.SIMPLE)
+                .setSearchMode(SearchMode.ANY);
+    }
+
+    private SearchOptions buildFuzzyOptions() {
+        return baseOptions()
+                .setQueryType(QueryType.FULL)
+                .setSearchMode(SearchMode.ALL);
+    }
+
+    private SearchOptions buildSemanticOptions(String query) {
+        return baseOptions()
+                .setQueryType(QueryType.SEMANTIC)
+                .setSearchMode(SearchMode.ANY)
+                .setSemanticSearchOptions(new SemanticSearchOptions()
+                        .setSemanticConfigurationName(searchProperties.getSemanticConfigurationName())
+                        .setSemanticQuery(query)
+                        .setErrorMode(SemanticErrorMode.PARTIAL)
+                        .setMaxWaitDuration(Duration.ofSeconds(2))
+                        .setQueryCaption(new QueryCaption(QueryCaptionType.EXTRACTIVE).setHighlightEnabled(true))
+                        .setQueryAnswer(new QueryAnswer(QueryAnswerType.EXTRACTIVE).setCount(3)));
+    }
+
+    private SearchOptions baseOptions() {
+        return new SearchOptions()
+                .setTop(searchProperties.getTop())
+                .setSearchFields(SEARCH_FIELDS)
+                .setIncludeTotalCount(false);
+    }
+
+    private String toFuzzyQuery(String query) {
+        return List.of(query.split("\\s+")).stream()
+                .map(this::sanitizeToken)
+                .filter(token -> !token.isBlank())
+                .map(token -> token + "~")
+                .reduce((left, right) -> left + " AND " + right)
+                .orElse("");
+    }
+
+    private String sanitizeToken(String token) {
+        return token.replaceAll("[^\\p{Alnum}]", "").toLowerCase();
     }
 
     private ProductResponseDTO toResponse(SearchDocument document) {
@@ -78,6 +164,4 @@ public class AzureProductSearchClient implements ProductSearchClient {
         return new ProductResponseDTO(id, name, description, price, category, createdAt);
     }
 }
-
-
 

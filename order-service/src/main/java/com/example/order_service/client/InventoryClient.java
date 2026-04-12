@@ -2,6 +2,7 @@ package com.example.order_service.client;
 
 import com.example.order_service.client.dto.ReduceInventoryRequestDTO;
 import com.example.order_service.client.dto.ReduceInventoryResponseDTO;
+import com.example.order_service.exception.DownstreamAuthorizationException;
 import com.example.order_service.exception.ExternalServiceException;
 import com.example.order_service.exception.ResourceNotFoundException;
 import java.util.UUID;
@@ -40,6 +41,14 @@ public class InventoryClient {
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new ResourceNotFoundException("Inventory not found for product");
             }
+            if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                throw new DownstreamAuthorizationException(HttpStatus.UNAUTHORIZED,
+                        "Authentication with inventory service failed");
+            }
+            if (ex.getStatusCode() == HttpStatus.FORBIDDEN) {
+                throw new DownstreamAuthorizationException(HttpStatus.FORBIDDEN,
+                        "The current token is not allowed to access inventory service");
+            }
             if (ex.getStatusCode() == HttpStatus.CONFLICT || ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
                 throw new IllegalStateException("Insufficient inventory");
             }
@@ -49,4 +58,3 @@ public class InventoryClient {
         }
     }
 }
-

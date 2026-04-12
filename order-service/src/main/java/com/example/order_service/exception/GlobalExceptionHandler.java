@@ -37,6 +37,14 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage(), request.getRequestURI());
     }
 
+    @ExceptionHandler(DownstreamAuthorizationException.class)
+    public ResponseEntity<ApiErrorResponse> handleDownstreamAuthorization(
+            DownstreamAuthorizationException ex,
+            HttpServletRequest request
+    ) {
+        return buildError(ex.getStatus(), ex.getMessage(), request.getRequestURI());
+    }
+
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ApiErrorResponse> handleIllegalState(IllegalStateException ex, HttpServletRequest request) {
         return buildError(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());

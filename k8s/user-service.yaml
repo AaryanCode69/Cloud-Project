@@ -57,6 +57,16 @@ spec:
               value: "update"
             - name: SERVER_PORT
               value: "8081"
+            - name: AZURE_ENTRA_TENANT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: azure-entra-secret
+                  key: AZURE_ENTRA_TENANT_ID
+            - name: AZURE_ENTRA_API_AUDIENCE
+              valueFrom:
+                secretKeyRef:
+                  name: azure-entra-secret
+                  key: AZURE_ENTRA_API_AUDIENCE
             - name: FEATURE_COSMOS_CATALOG_ENABLED
               value: "false"
             - name: FEATURE_COSMOS_CART_ENABLED
