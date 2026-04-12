@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: apnacloudproject.azurecr.io/user-service:v2
+          image: apnacloudproject.azurecr.io/user-service:v3
           ports:
             - containerPort: 8081
           env:

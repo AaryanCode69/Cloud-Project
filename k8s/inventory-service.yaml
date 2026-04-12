@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: inventory-service
-          image: apnacloudproject.azurecr.io/inventory-service:v2
+          image: apnacloudproject.azurecr.io/inventory-service:v4
           ports:
             - containerPort: 8083
           env:

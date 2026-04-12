@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: order-service
-          image: apnacloudproject.azurecr.io/order-service:v5
+          image: apnacloudproject.azurecr.io/order-service:v7
           ports:
             - containerPort: 8084
           env:
