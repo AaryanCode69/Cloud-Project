@@ -104,6 +104,16 @@ spec:
                 secretKeyRef:
                   name: azure-search-secret
                   key: AZURE_SEARCH_SEMANTIC_CONFIGURATION_NAME
+            - name: AZURE_SEARCH_SEMANTIC_ENABLED
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_SEMANTIC_ENABLED
+            - name: AZURE_SEARCH_FUZZY_ENABLED
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_FUZZY_ENABLED
             - name: SEARCH_INDEX_NAME
               valueFrom:
                 secretKeyRef:

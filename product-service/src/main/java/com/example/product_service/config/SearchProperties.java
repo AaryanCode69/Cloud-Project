@@ -8,7 +8,7 @@ public class SearchProperties {
     private String apiKey;
     private String indexName = "products";
     private String semanticConfigurationName = "products-semantic-config";
-    private boolean semanticEnabled = true;
+    private boolean semanticEnabled = false;
     private boolean fuzzyEnabled = true;
     private int top = 20;
 
