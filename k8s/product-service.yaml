@@ -54,11 +54,25 @@ spec:
                 secretKeyRef:
                   name: azure-entra-secret
                   key: AZURE_ENTRA_TENANT_ID
+                  optional: true
             - name: AZURE_ENTRA_API_AUDIENCE
               valueFrom:
                 secretKeyRef:
                   name: azure-entra-secret
                   key: AZURE_ENTRA_API_AUDIENCE
+                  optional: true
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              valueFrom:
+                secretKeyRef:
+                  name: azure-entra-secret
+                  key: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+                  optional: true
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES
+              valueFrom:
+                secretKeyRef:
+                  name: azure-entra-secret
+                  key: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES
+                  optional: true
             - name: COSMOS_URI
               valueFrom:
                 secretKeyRef:
@@ -104,16 +118,37 @@ spec:
                 secretKeyRef:
                   name: azure-search-secret
                   key: AZURE_SEARCH_SEMANTIC_CONFIGURATION_NAME
+                  optional: true
             - name: AZURE_SEARCH_SEMANTIC_ENABLED
               valueFrom:
                 secretKeyRef:
                   name: azure-search-secret
                   key: AZURE_SEARCH_SEMANTIC_ENABLED
+                  optional: true
             - name: AZURE_SEARCH_FUZZY_ENABLED
               valueFrom:
                 secretKeyRef:
                   name: azure-search-secret
                   key: AZURE_SEARCH_FUZZY_ENABLED
+                  optional: true
+            - name: SEARCH_SEMANTIC_CONFIGURATION_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_SEMANTIC_CONFIGURATION_NAME
+                  optional: true
+            - name: SEARCH_SEMANTIC_ENABLED
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_SEMANTIC_ENABLED
+                  optional: true
+            - name: SEARCH_FUZZY_ENABLED
+              valueFrom:
+                secretKeyRef:
+                  name: azure-search-secret
+                  key: AZURE_SEARCH_FUZZY_ENABLED
+                  optional: true
             - name: SEARCH_INDEX_NAME
               valueFrom:
                 secretKeyRef:

@@ -31,12 +31,18 @@ services:
     ports:
       - "8081:8081"
     environment:
+      SPRING_APPLICATION_NAME: user-service
       SPRING_PROFILES_ACTIVE: postgres
       POSTGRES_DATASOURCE_URL: jdbc:postgresql://postgres:5432/userdb
       POSTGRES_DATASOURCE_USERNAME: postgres
       POSTGRES_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/userdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
       AZURE_ENTRA_TENANT_ID: dc1365e3-59f8-4188-865f-5e4607b295c4
       AZURE_ENTRA_API_AUDIENCE: api://ce89a7d0-8fae-45e3-b846-cb5eb435e883
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: https://login.microsoftonline.com/dc1365e3-59f8-4188-865f-5e4607b295c4/v2.0
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES: api://ce89a7d0-8fae-45e3-b846-cb5eb435e883
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: 8081
     depends_on:
@@ -52,12 +58,21 @@ services:
     ports:
       - "8082:8082"
     environment:
+      SPRING_APPLICATION_NAME: product-service
       SPRING_PROFILES_ACTIVE: postgres
       POSTGRES_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productdb
       POSTGRES_DATASOURCE_USERNAME: postgres
       POSTGRES_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/productdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
       AZURE_ENTRA_TENANT_ID: dc1365e3-59f8-4188-865f-5e4607b295c4
       AZURE_ENTRA_API_AUDIENCE: api://ce89a7d0-8fae-45e3-b846-cb5eb435e883
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: https://login.microsoftonline.com/dc1365e3-59f8-4188-865f-5e4607b295c4/v2.0
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES: api://ce89a7d0-8fae-45e3-b846-cb5eb435e883
+      FEATURE_COSMOS_CATALOG_ENABLED: "false"
+      FEATURE_AISEARCH_ENABLED: "false"
+      FEATURE_SERVICEBUS_ENABLED: "false"
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: 8082
     depends_on:
@@ -73,12 +88,19 @@ services:
     ports:
       - "8083:8083"
     environment:
+      SPRING_APPLICATION_NAME: inventory-service
       SPRING_PROFILES_ACTIVE: postgres
       POSTGRES_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inventorydb
       POSTGRES_DATASOURCE_USERNAME: postgres
       POSTGRES_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/inventorydb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
       AZURE_ENTRA_TENANT_ID: dc1365e3-59f8-4188-865f-5e4607b295c4
       AZURE_ENTRA_API_AUDIENCE: api://ce89a7d0-8fae-45e3-b846-cb5eb435e883
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: https://login.microsoftonline.com/dc1365e3-59f8-4188-865f-5e4607b295c4/v2.0
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES: api://ce89a7d0-8fae-45e3-b846-cb5eb435e883
+      FEATURE_SERVICEBUS_ENABLED: "false"
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: 8083
     depends_on:
@@ -94,12 +116,20 @@ services:
     ports:
       - "8084:8084"
     environment:
+      SPRING_APPLICATION_NAME: order-service
       SPRING_PROFILES_ACTIVE: postgres
       POSTGRES_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orderdb
       POSTGRES_DATASOURCE_USERNAME: postgres
       POSTGRES_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/orderdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
       AZURE_ENTRA_TENANT_ID: dc1365e3-59f8-4188-865f-5e4607b295c4
       AZURE_ENTRA_API_AUDIENCE: api://ce89a7d0-8fae-45e3-b846-cb5eb435e883
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: https://login.microsoftonline.com/dc1365e3-59f8-4188-865f-5e4607b295c4/v2.0
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES: api://ce89a7d0-8fae-45e3-b846-cb5eb435e883
+      FEATURE_COSMOS_CART_ENABLED: "false"
+      FEATURE_SERVICEBUS_ENABLED: "false"
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: 8084
       EXTERNAL_PRODUCT_SERVICE_URL: http://product-service:8082

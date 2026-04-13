@@ -75,11 +75,25 @@ spec:
                 secretKeyRef:
                   name: azure-entra-secret
                   key: AZURE_ENTRA_TENANT_ID
+                  optional: true
             - name: AZURE_ENTRA_API_AUDIENCE
               valueFrom:
                 secretKeyRef:
                   name: azure-entra-secret
                   key: AZURE_ENTRA_API_AUDIENCE
+                  optional: true
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+              valueFrom:
+                secretKeyRef:
+                  name: azure-entra-secret
+                  key: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI
+                  optional: true
+            - name: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES
+              valueFrom:
+                secretKeyRef:
+                  name: azure-entra-secret
+                  key: SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_AUDIENCES
+                  optional: true
             - name: AZURE_SERVICEBUS_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:

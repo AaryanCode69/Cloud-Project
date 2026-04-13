@@ -3,3 +3,9 @@
 /inventory-service/src/main/resources/application.yaml
 /user-service/src/main/resources/application.yaml
 rules.md
+
+# Local runtime/test artifacts
+*.log
+docker-compose-run.log
+user-service-build.log
+reg-response.json

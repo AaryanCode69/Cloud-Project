@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnProperty(prefix = "feature", name = "cosmos-catalog-enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class CosmosCatalogService {
     private final CosmosContainer catalogContainer;

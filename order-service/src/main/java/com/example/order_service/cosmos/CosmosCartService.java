@@ -7,9 +7,11 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnProperty(prefix = "feature", name = "cosmos-cart-enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class CosmosCartService {
     private final CosmosContainer cartContainer;
