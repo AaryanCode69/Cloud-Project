@@ -15,12 +15,13 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 @RequiredArgsConstructor
-public class ProductClient {
+public class ProductClient implements ProductGateway {
     private final RestTemplate restTemplate;
 
     @Value("${external.product-service-url}")
     private String productServiceUrl;
 
+    @Override
     public ProductClientResponseDTO getProductById(UUID productId) {
         String url = productServiceUrl + "/api/products/" + productId;
         try {

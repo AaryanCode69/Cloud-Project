@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
@@ -19,24 +18,24 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 @RequiredArgsConstructor
-public class InventoryClient {
+public class InventoryClient implements InventoryGateway {
     private final RestTemplate restTemplate;
 
     @Value("${external.inventory-service-url}")
     private String inventoryServiceUrl;
 
-    public ReduceInventoryResponseDTO reduceInventory(UUID productId, int quantity) {
+    @Override
+    public void reduceInventory(UUID productId, int quantity) {
         String url = inventoryServiceUrl + "/api/inventory/reduce";
         ReduceInventoryRequestDTO request = new ReduceInventoryRequestDTO(productId, quantity);
 
         try {
-            ResponseEntity<ReduceInventoryResponseDTO> response = restTemplate.exchange(
+            restTemplate.exchange(
                     url,
                     HttpMethod.PUT,
                     new HttpEntity<>(request),
                     ReduceInventoryResponseDTO.class
             );
-            return response.getBody();
         } catch (RestClientResponseException ex) {
             if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
                 throw new ResourceNotFoundException("Inventory not found for product");

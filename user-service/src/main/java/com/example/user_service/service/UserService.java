@@ -7,11 +7,13 @@ import com.example.user_service.entity.User;
 import com.example.user_service.exception.DuplicateResourceException;
 import com.example.user_service.exception.ResourceNotFoundException;
 import com.example.user_service.repository.UserRepository;
+import java.util.Locale;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,14 +22,16 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     public UserResponseDTO registerUser(UserRequestDTO request) {
-        if (userRepository.existsByEmail(request.email())) {
+        String normalizedEmail = normalizeEmail(request.email());
+        if (userRepository.existsByEmail(normalizedEmail)) {
             throw new DuplicateResourceException("Email already exists");
         }
 
         User user = User.builder()
-                .name(request.name())
-                .email(request.email())
+                .name(request.name().trim())
+                .email(normalizedEmail)
                 .password(request.password())
                 .role(Role.USER)
                 .build();
@@ -37,10 +41,15 @@ public class UserService {
         return toResponse(saved);
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDTO getUserById(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return toResponse(user);
+    }
+
+    private String normalizeEmail(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 
     private UserResponseDTO toResponse(User user) {
@@ -53,4 +62,3 @@ public class UserService {
         );
     }
 }
-

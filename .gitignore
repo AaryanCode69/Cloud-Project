@@ -3,7 +3,9 @@
 /inventory-service/src/main/resources/application.yaml
 /user-service/src/main/resources/application.yaml
 rules.md
-
+executionplan.md
+run_script.sh
+MICROSOFT_ENTRA_ID_AUTH.md
 # Local runtime/test artifacts
 *.log
 docker-compose-run.log

@@ -3,6 +3,9 @@ package com.example.order_service.cosmos;
 import com.azure.cosmos.CosmosContainer;
 import com.azure.cosmos.models.CosmosItemResponse;
 import com.azure.cosmos.models.PartitionKey;
+import com.example.order_service.cart.CartMapper;
+import com.example.order_service.cart.CartSnapshot;
+import com.example.order_service.cart.CartStore;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,11 +16,13 @@ import org.springframework.stereotype.Service;
 @Service
 @ConditionalOnProperty(prefix = "feature", name = "cosmos-cart-enabled", havingValue = "true")
 @RequiredArgsConstructor
-public class CosmosCartService {
+public class CosmosCartService implements CartStore {
     private final CosmosContainer cartContainer;
+    private final CartMapper cartMapper;
 
-    public CosmosCartDocument addItem(UUID userId, UUID productId, int quantity) {
-        CosmosCartDocument cart = findByUserId(userId).orElseGet(() -> newCart(userId));
+    @Override
+    public CartSnapshot addItem(UUID userId, UUID productId, int quantity) {
+        CosmosCartDocument cart = findDocumentByUserId(userId).orElseGet(() -> newCart(userId));
 
         cart.getItems().stream()
                 .filter(item -> item.getProductId().equals(productId.toString()))
@@ -31,10 +36,24 @@ public class CosmosCartService {
                 );
 
         cart.setUpdatedAt(Instant.now());
-        return upsert(cart);
+        return cartMapper.toSnapshot(upsert(cart));
     }
 
-    public Optional<CosmosCartDocument> findByUserId(UUID userId) {
+    @Override
+    public Optional<CartSnapshot> findByUserId(UUID userId) {
+        return findDocumentByUserId(userId).map(cartMapper::toSnapshot);
+    }
+
+    @Override
+    public void clear(UUID userId) {
+        findDocumentByUserId(userId).ifPresent(cart -> cartContainer.deleteItem(
+                cart.getId(),
+                new PartitionKey(cart.getUserId()),
+                null
+        ));
+    }
+
+    private Optional<CosmosCartDocument> findDocumentByUserId(UUID userId) {
         try {
             CosmosItemResponse<CosmosCartDocument> response = cartContainer.readItem(
                     userId.toString(),
@@ -45,14 +64,6 @@ public class CosmosCartService {
         } catch (Exception ex) {
             return Optional.empty();
         }
-    }
-
-    public void clear(UUID userId) {
-        findByUserId(userId).ifPresent(cart -> cartContainer.deleteItem(
-                cart.getId(),
-                new PartitionKey(cart.getUserId()),
-                null
-        ));
     }
 
     private CosmosCartDocument upsert(CosmosCartDocument cart) {
@@ -67,4 +78,3 @@ public class CosmosCartService {
                 .build();
     }
 }
-

@@ -94,6 +94,24 @@ flowchart LR
 └── infra/azure/
 ```
 
+## Code Structure
+
+The repo now follows a clearer ports-and-adapters style inside each service so business workflows stay readable even when optional Azure integrations are enabled.
+
+- controllers own the HTTP contract, validation entry point, and response status codes
+- application services coordinate use cases such as register user, create product, reduce inventory, and place order
+- ports/adapters isolate persistence choices, downstream service calls, and optional cloud integrations behind explicit interfaces
+- mappers handle request normalization and DTO translation so orchestration code is not mixed with field-copying
+
+Examples of the current structure:
+
+| Service | Core abstractions |
+| ------- | ----------------- |
+| `product-service` | `ProductCatalog` switches between JPA and Cosmos implementations; `ProductSearchClient` switches between Azure AI Search and local catalog-backed search; `ProductMapper` centralizes normalization and response mapping |
+| `order-service` | `OrderStore` isolates relational persistence; `ProductGateway` and `InventoryGateway` isolate downstream HTTP calls; `CartStore` isolates optional Cosmos cart behavior; `OrderMapper` and `CartMapper` keep orchestration methods focused on checkout flow |
+| `inventory-service` | inventory write logic is centralized in `InventoryService`, including duplicate-product checks and stock reduction rules |
+| `user-service` | registration logic normalizes emails before persistence and keeps validation rules in the request contract |
+
 ## Service Architecture
 
 | Service             | Port | Responsibility                                                        | Primary APIs                                                                                                                                                                             | Persistence                                                           | Downstream Calls                                                                |
@@ -117,15 +135,17 @@ This service does not participate in checkout orchestration or downstream calls.
 
 ### Product Service
 
-`product-service` is the source of truth for catalog data, but the backing store is switchable:
+`product-service` is the source of truth for catalog data, but the backing store is switchable through the `ProductCatalog` port:
 
-- default path: JPA entity `Product` in the `products` table
-- optional Azure path: `CosmosProductDocument` in a Cosmos container partitioned by `/id`
+- `JpaProductCatalog`: JPA entity `Product` in the `products` table
+- `CosmosProductCatalog`: `CosmosProductDocument` in a Cosmos container partitioned by `/id`
 
-On product create/update, the service also attempts to upsert the document into Azure AI Search when that feature is enabled. Search behavior is also switchable:
+On product create/update, the service also attempts to upsert the document into Azure AI Search when that feature is enabled. Search behavior is switchable through `ProductSearchClient`:
 
-- AI Search enabled: query Azure AI Search
-- AI Search disabled: perform an in-process filter over the current product list
+- AI Search enabled: `AzureProductSearchClient` queries Azure AI Search
+- AI Search disabled: `CatalogBackedProductSearchClient` performs an in-process filter over the active catalog
+
+This keeps the service layer focused on product use cases instead of feature-flag branches.
 
 ### Inventory Service
 
@@ -135,11 +155,21 @@ On product create/update, the service also attempts to upsert the document into 
 - lookup by `productId`
 - stock reduction via `PUT /api/inventory/reduce`
 
+The service now explicitly rejects duplicate inventory creation for the same product before performing stock updates.
+
 Although the service can consume `OrderCreatedEvent` messages from Service Bus, the current implementation only logs consumed messages. Inventory reduction for checkout still happens synchronously through the REST API.
 
 ### Order Service
 
-`order-service` is the orchestration boundary for checkout. It:
+`order-service` is the orchestration boundary for checkout. Its orchestration code now depends on explicit ports so the checkout flow reads in business terms rather than infrastructure terms:
+
+- `ProductGateway` for catalog lookup
+- `InventoryGateway` for stock reduction
+- `OrderStore` for relational persistence
+- `CartStore` for optional Cosmos-backed cart behavior
+- `OrderEventPublisher` for optional event emission
+
+At runtime it still:
 
 - receives the order request
 - fetches product details from `product-service`
@@ -147,7 +177,7 @@ Although the service can consume `OrderCreatedEvent` messages from Service Bus, 
 - calculates total amount
 - stores the relational order and order items
 - optionally publishes an `OrderCreatedEvent`
-- optionally clears the user cart in Cosmos DB
+- optionally clears the user cart in Cosmos DB through the configured `CartStore`
 
 This makes `order-service` the central coordination point of the business flow.
 

@@ -8,5 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InventoryRepository extends JpaRepository<Inventory, UUID> {
+    boolean existsByProductId(UUID productId);
+
     Optional<Inventory> findByProductId(UUID productId);
 }
